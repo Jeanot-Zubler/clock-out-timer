@@ -1,8 +1,8 @@
 import re
 import datetime as dt
 
-target_time = dt.timedelta(hours=8, minutes=30)
 
+file_name = "ReportExport.rtf"
 
 def get_lines_from_file(f):
     matches = []
@@ -23,7 +23,9 @@ def match_to_times(match):
     return datetimes
 
 
-def calculate_leaving_time(datetimes):
+def calculate_leaving_time(datetimes, target_time="8:30"):
+    h, m = target_time.split(":")
+    target_time = dt.timedelta(hours=int(h), minutes=int(m))
     worked = dt.timedelta(0)
     now = dt.datetime.now().replace(second=0, microsecond=0)
     i = 1
@@ -43,8 +45,10 @@ def calculate_leaving_time(datetimes):
     else:
         print(f"You made {worked-target_time} of overtime so far.")
 
+def main(file_name="ReportExport.rtf", target_time="8:30"):
+    with open(file_name, "r") as f:
+        matches = get_lines_from_file(f)
+        calculate_leaving_time(match_to_times(matches[-1]), target_time)
 
-with open("ReportExport.rtf", "r") as f:
-    matches = get_lines_from_file(f)
-    print(matches)
-    calculate_leaving_time(match_to_times(matches[-1]))
+if __name__ == "__main__":
+    main()
