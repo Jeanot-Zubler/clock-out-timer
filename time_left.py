@@ -2,7 +2,10 @@ import re
 import datetime as dt
 
 
-file_name = "ReportExport.rtf"
+report = "ReportExport.rtf"
+min_break_sub_9 = dt.timedelta(minutes=45)
+min_break_after_9 = dt.timedelta(hours=1)
+
 
 def get_lines_from_file(f):
     matches = []
@@ -27,10 +30,15 @@ def calculate_leaving_time(datetimes, target_time="8:30"):
     h, m = target_time.split(":")
     target_time = dt.timedelta(hours=int(h), minutes=int(m))
     worked = dt.timedelta(0)
+    break_time = dt.timedelta(0)
+    breaks = 0
     now = dt.datetime.now().replace(second=0, microsecond=0)
     i = 1
     while i < len(datetimes):
         worked += datetimes[i] - datetimes[i-1]
+        if i >= 2:
+            break_time += datetimes[i-1] - datetimes[i-2]
+            breaks += 1
         i += 2
     if len(datetimes) % 2 == 0:
         print(
@@ -40,15 +48,20 @@ def calculate_leaving_time(datetimes, target_time="8:30"):
         print(
             f"You have worked {worked} so far and are currently on the clock.")
     if worked < target_time:
-        print(
-            f"You will be finished at {now+target_time-worked}.")
+        print(f"You will be finished at {now+target_time-worked}.")
     else:
         print(f"You made {worked-target_time} of overtime so far.")
+    if breaks >= 1:
+        print(f"You have had {break_time} break so far. You need "
+              + f"{max(dt.timedelta(0), min_break_sub_9 - break_time)} / "
+              + f"{max(dt.timedelta(0), min_break_after_9 - break_time)} more.")
 
-def main(file_name="ReportExport.rtf", target_time="8:30"):
+
+def main(file_name=report, target_time="8:30"):
     with open(file_name, "r") as f:
         matches = get_lines_from_file(f)
         calculate_leaving_time(match_to_times(matches[-1]), target_time)
+
 
 if __name__ == "__main__":
     main()
