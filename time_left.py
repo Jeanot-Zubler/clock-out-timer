@@ -36,8 +36,8 @@ def calculate_leaving_time(datetimes, target_time="8:30"):
     i = 1
     while i < len(datetimes):
         worked += datetimes[i] - datetimes[i-1]
-        if i >= 2:
-            break_time += datetimes[i-1] - datetimes[i-2]
+        if i < len(datetimes) - 1:
+            break_time += datetimes[i+1] - datetimes[i]
             breaks += 1
         i += 2
     if len(datetimes) % 2 == 0:
