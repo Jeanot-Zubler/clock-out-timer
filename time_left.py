@@ -3,7 +3,7 @@ import datetime as dt
 
 
 report = "ReportExport.rtf"
-min_break_sub_9 = dt.timedelta(minutes=45)
+min_break_sub_9 = dt.timedelta(minutes=30)
 min_break_after_9 = dt.timedelta(hours=1)
 
 
@@ -41,6 +41,8 @@ def calculate_leaving_time(datetimes, target_time="8:30"):
             breaks += 1
         i += 2
     if len(datetimes) % 2 == 0:
+        breaks += 1
+        break_time += now - datetimes[-1]
         print(
             f"You have worked {worked} so far and are currently off the clock.")
     else:
@@ -52,7 +54,7 @@ def calculate_leaving_time(datetimes, target_time="8:30"):
     else:
         print(f"You made {worked-target_time} of overtime so far.")
     if breaks >= 1:
-        print(f"You have had {break_time} break so far. You need "
+        print(f"You have had {break_time} break in {breaks} blocks so far. You need "
               + f"{max(dt.timedelta(0), min_break_sub_9 - break_time)} / "
               + f"{max(dt.timedelta(0), min_break_after_9 - break_time)} more.")
 
